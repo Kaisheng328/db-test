@@ -2,15 +2,10 @@ package routes
 
 import (
 	"myproject/handlers"
-
-	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
-func RegisterRoutes(router *gin.Engine) {
-	// User routes
-	userGroup := router.Group("/users")
-	{
-		userGroup.POST("/", handlers.CreateUser) // Endpoint to create a user
-		userGroup.GET("/", handlers.GetUsers)    // Endpoint to fetch all users
-	}
+func RegisterRoutes() {
+	http.HandleFunc("/signup", handlers.SignupHandler)
+	http.HandleFunc("/login", handlers.LoginHandler)
 }

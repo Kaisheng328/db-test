@@ -1,37 +1,38 @@
 package models
 
 import (
-	"myproject/database"
+	"database/sql"
+	"errors"
 )
 
 type User struct {
 	ID        int    `json:"id"`
 	Name      string `json:"name"`
 	Email     string `json:"email"`
+	LoginID   string `json:"login_id"`
+	Password  string `json:"-"`
 	CreatedAt string `json:"created_at"`
 }
 
-func CreateUser(name, email string) error {
-	query := "INSERT INTO users (name, email) VALUES (?, ?)"
-	_, err := database.DB.Exec(query, name, email)
-	return err
+func CreateUser(db *sql.DB, name, email, loginID, hashedPassword string) error {
+	query := `INSERT INTO users (name, email, login_id, password) VALUES (?, ?, ?, ?)`
+	_, err := db.Exec(query, name, email, loginID, hashedPassword)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func GetAllUsers() ([]User, error) {
-	query := "SELECT id, name, email, created_at FROM users"
-	rows, err := database.DB.Query(query)
+// GetUserPassword retrieves the hashed password for a given login ID
+func GetUserPassword(db *sql.DB, loginID string) (string, error) {
+	var hashedPassword string
+	query := `SELECT password FROM users WHERE login_id = ?`
+	err := db.QueryRow(query, loginID).Scan(&hashedPassword)
+	if err == sql.ErrNoRows {
+		return "", errors.New("user not found")
+	}
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	defer rows.Close()
-
-	var users []User
-	for rows.Next() {
-		var user User
-		if err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.CreatedAt); err != nil {
-			return nil, err
-		}
-		users = append(users, user)
-	}
-	return users, nil
+	return hashedPassword, nil
 }
