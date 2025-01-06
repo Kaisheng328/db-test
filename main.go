@@ -9,6 +9,7 @@ import (
 
 func main() {
 	// Initialize the database
+	http.Handle("/", http.FileServer(http.Dir("./frontend")))
 	if err := database.InitDatabase(); err != nil {
 		log.Fatalf("Database initialization failed: %v", err)
 	}
@@ -23,4 +24,5 @@ func main() {
 
 	log.Println("Server running on http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
+
 }
