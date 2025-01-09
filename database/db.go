@@ -40,3 +40,18 @@ func CreateUsersTable() error {
 	log.Println("Users table created successfully")
 	return nil
 }
+func CreateMovieTable() error {
+	query := `
+    CREATE TABLE IF NOT EXISTS movies (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    url TEXT NOT NULL
+);`
+	_, err := DB.Exec(query)
+	if err != nil {
+		return err
+	}
+
+	log.Println("Movie table created successfully")
+	return nil
+}
